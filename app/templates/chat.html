@@ -8,7 +8,7 @@
 
       window.addEventListener('DOMContentLoaded', () => {
         // Connect to the Flask-SocketIO server namespace '/chat'
-        socket = io(`http://${document.domain}:${location.port}/chat`);
+        socket = io(`https://${document.domain}:${location.port}/chat`);
 
         // When connection is established
         socket.on('connect', () => {
