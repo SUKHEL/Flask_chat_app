@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Flask-SocketIO-Chat: {{ room }}</title>
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <script>
+      let socket;
+
+      window.addEventListener('DOMContentLoaded', () => {
+        // Connect to the Flask-SocketIO server namespace '/chat'
+        socket = io(`http://${document.domain}:${location.port}/chat`);
+
+        // When connection is established
+        socket.on('connect', () => {
+          socket.emit('joined', {});
+        });
+
+        // Handle status messages
+        socket.on('status', (data) => {
+          const d = new Date();
+          const chatBox = document.getElementById('chat');
+          chatBox.value += `[${d.toLocaleTimeString()}] <${data.msg}>\n`;
+            
+        });
+
+        // Handle user messages
+        socket.on('message', (data) => {
+          const d = new Date();
+          const chatBox = document.getElementById('chat');
+          chatBox.value += `[${d.toLocaleTimeString()}] ${data.msg}\n`;
+        
+        });
+
+        // Handle sending messages on Enter key
+        const textInput = document.getElementById('text');
+        textInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            const message = textInput.value.trim();
+            if (message !== '') {
+              socket.emit('text', { msg: message });
+              textInput.value = '';
+            }
+            e.preventDefault(); // prevent newline
+          }
+        });
+      });
+
+      function leave_room() {
+        socket.emit('left', {}, () => {
+          socket.disconnect();
+          window.location.href = "{{ url_for('main.index') }}";
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Flask-SocketIO-Chat: {{ room }}</h1>
+    <textarea id="chat" cols="80" rows="20" readonly></textarea><br><br>
+    <input id="text" size="80" placeholder="Enter your message here"><br><br>
+    <a href="#" onclick="leave_room(); return false;">Leave this room</a>
+  </body>
+</html>

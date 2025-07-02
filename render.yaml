@@ -1,0 +1,7 @@
+services:
+type: web
+name: flask-chat-app
+env: python
+buildcommand: ""
+startcommand: gunicorn --worker-class eventlet -w 1 chat:app
+autoDeploy: true"
